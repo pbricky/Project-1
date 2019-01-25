@@ -178,11 +178,37 @@ $(document).ready(function () {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0bSlcbmxpYnJhcnkodGlkeXRleHQpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoRFQpXG5gYGAifQ== -->
+<pre class="r"><code>library(tm)
+library(tidytext)
+library(tidyverse)
+library(DT)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xlYW5lZF9obSA8LSByZWFkX2NzdihcbiAgZmlsZSA9ICdEOi9CbyBQZW5nL0NvbHVtYmlhL1NwcmluZyAyMDE5L0FwcGxpZWQgRGF0YSBTY2llbmNlIDUyNDMvUHJvamVjdC0xL2RhdGEvY2xlYW5lZF9obS5jc3YnKVxub3JpZ2luYWxfaG0gPC0gcmVhZF9jc3YoXG4gIGZpbGUgPSAnRDovQm8gUGVuZy9Db2x1bWJpYS9TcHJpbmcgMjAxOS9BcHBsaWVkIERhdGEgU2NpZW5jZSA1MjQzL1Byb2plY3QtMS9kYXRhL29yaWdpbmFsX2htLmNzdicpXG5kZW1vZ3JhcGhpYyA8LSByZWFkX2NzdihcbiAgZmlsZSA9ICdEOi9CbyBQZW5nL0NvbHVtYmlhL1NwcmluZyAyMDE5L0FwcGxpZWQgRGF0YSBTY2llbmNlIDUyNDMvUHJvamVjdC0xL2RhdGEvZGVtb2dyYXBoaWMuY3N2JylcbnNlbnNlbGFiZWwgPC0gcmVhZF9jc3YoXG4gIGZpbGUgPSAnRDovQm8gUGVuZy9Db2x1bWJpYS9TcHJpbmcgMjAxOS9BcHBsaWVkIERhdGEgU2NpZW5jZSA1MjQzL1Byb2plY3QtMS9kYXRhL3NlbnNlbGFiZWwuY3N2JylcbnZhZCA8LSByZWFkX2NzdihcbiAgZmlsZSA9ICdEOi9CbyBQZW5nL0NvbHVtYmlhL1NwcmluZyAyMDE5L0FwcGxpZWQgRGF0YSBTY2llbmNlIDUyNDMvUHJvamVjdC0xL2RhdGEvdmFkLmNzdicpXG5gYGAifQ== -->
+<pre class="r"><code>cleaned_hm &lt;- read_csv(
+  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/cleaned_hm.csv')
+original_hm &lt;- read_csv(
+  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/original_hm.csv')
+demographic &lt;- read_csv(
+  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/demographic.csv')
+senselabel &lt;- read_csv(
+  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/senselabel.csv')
+vad &lt;- read_csv(
+  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/vad.csv')</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkhhcHB5REIgRURBIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpgYGB7cn0NCg0KYGBgDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkhhcHB5REIgRURBIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpgYGB7ciBsb2FkIGxpYnJhcmllcywgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRX0NCmxpYnJhcnkodG0pDQpsaWJyYXJ5KHRpZHl0ZXh0KQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KERUKQ0KYGBgDQoNCmBgYHtyIGxvYWQgZGF0YSwgbWVzc2FnZT1GQUxTRSwgd2FybmluZz1GQUxTRX0NCmNsZWFuZWRfaG0gPC0gcmVhZF9jc3YoDQogIGZpbGUgPSAnRDovQm8gUGVuZy9Db2x1bWJpYS9TcHJpbmcgMjAxOS9BcHBsaWVkIERhdGEgU2NpZW5jZSA1MjQzL1Byb2plY3QtMS9kYXRhL2NsZWFuZWRfaG0uY3N2JykNCm9yaWdpbmFsX2htIDwtIHJlYWRfY3N2KA0KICBmaWxlID0gJ0Q6L0JvIFBlbmcvQ29sdW1iaWEvU3ByaW5nIDIwMTkvQXBwbGllZCBEYXRhIFNjaWVuY2UgNTI0My9Qcm9qZWN0LTEvZGF0YS9vcmlnaW5hbF9obS5jc3YnKQ0KZGVtb2dyYXBoaWMgPC0gcmVhZF9jc3YoDQogIGZpbGUgPSAnRDovQm8gUGVuZy9Db2x1bWJpYS9TcHJpbmcgMjAxOS9BcHBsaWVkIERhdGEgU2NpZW5jZSA1MjQzL1Byb2plY3QtMS9kYXRhL2RlbW9ncmFwaGljLmNzdicpDQpzZW5zZWxhYmVsIDwtIHJlYWRfY3N2KA0KICBmaWxlID0gJ0Q6L0JvIFBlbmcvQ29sdW1iaWEvU3ByaW5nIDIwMTkvQXBwbGllZCBEYXRhIFNjaWVuY2UgNTI0My9Qcm9qZWN0LTEvZGF0YS9zZW5zZWxhYmVsLmNzdicpDQp2YWQgPC0gcmVhZF9jc3YoDQogIGZpbGUgPSAnRDovQm8gUGVuZy9Db2x1bWJpYS9TcHJpbmcgMjAxOS9BcHBsaWVkIERhdGEgU2NpZW5jZSA1MjQzL1Byb2plY3QtMS9kYXRhL3ZhZC5jc3YnKQ0KYGBgDQoNCmBgYHtyLCBjbGVhbn0NCg0KYGBgDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0KDQoNCg0K</div>
 
 
 
