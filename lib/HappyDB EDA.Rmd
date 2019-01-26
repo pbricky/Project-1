@@ -1,5 +1,5 @@
 ---
-title: "HappyDB EDA"
+title: "HappyDB EDA self study code"
 output: html_notebook
 ---
 
@@ -14,18 +14,26 @@ library(DT)
 ```{r load data, message=FALSE, warning=FALSE}
 cleaned_hm <- read_csv(
   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/cleaned_hm.csv')
-original_hm <- read_csv(
-  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/original_hm.csv')
-demographic <- read_csv(
-  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/demographic.csv')
-senselabel <- read_csv(
-  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/senselabel.csv')
-vad <- read_csv(
-  file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/vad.csv')
+# original_hm <- read_csv(
+#   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/original_hm.csv')
+# demographic <- read_csv(
+#   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/demographic.csv')
+# senselabel <- read_csv(
+#   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/senselabel.csv')
+# vad <- read_csv(
+#   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/vad.csv')
 ```
 
-```{r, clean}
-
+```{r check abnormalities}
+text <- cleaned_hm$cleaned_hm
+length(grep("[A-Z]{5,}", text)) # check if there exists five consecutive capital letters
+#length is nonzero, so there are moments with consecutive five capital letter (in another word, have not been lowercased)
+#method one
+lowertext <- tolower(text)
+#method 2, use tidytext
+# need to create a corpus first
+text_corpus <- VCorpus(VectorSource(cleaned_hm$cleaned_hm))
+lowertext <- tm_map(text_corpus, content_transformer(tolower))
 ```
 
 
