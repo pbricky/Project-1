@@ -14,6 +14,7 @@ library(DT)
 ```{r load data, message=FALSE, warning=FALSE}
 cleaned_hm <- read_csv(
   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/cleaned_hm.csv')
+# the read_csv is faster comparing to read.csv, especially for large file
 # original_hm <- read_csv(
 #   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/original_hm.csv')
 # demographic <- read_csv(
@@ -24,19 +25,60 @@ cleaned_hm <- read_csv(
 #   file = 'D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243/Project-1/data/vad.csv')
 ```
 
-```{r check abnormalities}
+```{r rewrite code without pipeline, warning=FALSE, message=FALSE}
 text <- cleaned_hm$cleaned_hm
 length(grep("[A-Z]{5,}", text)) # check if there exists five consecutive capital letters
 #length is nonzero, so there are moments with consecutive five capital letter (in another word, have not been lowercased)
 #method one
-lowertext <- tolower(text)
+# lowertext <- tolower(text)
 #method 2, use tidytext
 # need to create a corpus first
-text_corpus <- VCorpus(VectorSource(cleaned_hm$cleaned_hm))
-lowertext <- tm_map(text_corpus, content_transformer(tolower))
+text_corpus <- VCorpus(VectorSource(text))
+text_corpus <- tm_map(text_corpus, content_transformer(tolower))
+# the content_transformer simply creates a function, which is tolower in deault fun, and apply to text through tm_map
+# with the content transformer, you can create specified fcn for further use
+text_corpus <- tm_map(text_corpus, removePunctuation)
+text_corpus <- tm_map(text_corpus, removeNumbers)
+text_corpus <- tm_map(text_corpus, removeWords, words = character(0))
+# in the tm_map fcn, tm_map(text, fcn, fcn arguments)
+text_corpus <- tm_map(text_corpus, stripWhitespace)
+
+#stem words and transfer to tidy tibble
+text_corpus <- tm_map(text_corpus, stemDocument)
+text_tidy <- tidy(text_corpus)
+text_tidy <- select(text_tidy, text)
+
+#create dictionary and tokenizing
+dict <- tidy(text_corpus)
+dict <- select(dict, text)
+dict <- unnest_tokens(dict, dictionary, text)
+# unnest_tokens(data, output column name, input column name)
+
+
+# Adding custom stopwords
+word <- c("happy","ago","yesterday","lot","today","months","month",
+                 "happier","happiest","last","week","past")
+# the name here has to be the same as the stop_words column name, which is 'word'
+# so that it can be binded successfully
+stop_dict <- bind_rows(stop_words, data.frame(word))
+stop_dict[!(stop_dict$lexicon %in% unique(stop_dict$lexicon)[-4]), 'lexicon'] <- 'updated'
 ```
 
+```{r for comparison}
+txt <- cleaned_hm$cleaned_hm
+txt_corpus <-VCorpus(VectorSource(txt)) %>%
+  tm_map(content_transformer(tolower)) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removeWords, words = character(0))
 
+
+stop_dict <- stop_words %>%
+  bind_rows(mutate(tibble(word), lexicon = "updated"))
+
+
+a[!(a$lexicon %in% unique(a$lexicon)[-4]), 'lexicon'] <- 'updated'
+```
 
 
 
