@@ -338,6 +338,8 @@ How our presidents (or candidates) alternate between long and short sentences an
 
 ![image](http://www.staffordschools.net/cms/lib011/VA01818723/Centricity/Domain/3574/character_icon.png)
 
+
+
 ```{r, fig.height=2.5, fig.width=2}
 par(mfrow=c(4,1), mar=c(1,0,2,0), bty="n", xaxt="n", yaxt="n", font.main=1)
 

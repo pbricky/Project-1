@@ -1,0 +1,206 @@
+---
+title: "Speeches Text Minning"
+output: html_notebook
+---
+
+
+```{r, message=FALSE, warning=FALSE}
+library("rvest")
+library("tibble")
+library("tidytext")
+library("tidyverse")
+library("qdap")
+library("sentimentr")
+library("gplots")
+library("dplyr")
+library("tm")
+library("syuzhet")
+library("factoextra")
+library("beeswarm")
+library("scales")
+library("RColorBrewer")
+library("RANN")
+library("tm")
+library("topicmodels")
+library("readtext")
+library("stringr")
+library("ggplot2")
+```
+
+```{r, reading inaugurals speeches}
+txtnames <- list.files('D:/Bo Peng/Columbia/Spring 2019/Applied Data Science 5243 Liu/ADS_Teaching/Tutorials/wk2-TextMining/data/inaugurals', pattern = '*.txt', full.names = T)
+
+speech <- data.frame()
+
+for (speechname in txtnames){
+  speech <- rbind(speech, readtext(file = speechname))
+}
+```
+
+```{r, preprocessing}
+speech$text <- tolower(speech$text)
+inaug.names <- speech$doc_id
+inaug.names <- substr(inaug.names,6,nchar(inaug.names)-4)
+speech$doc_id <- tolower(inaug.names)
+```
+
+```{r, number of sentences, avg word in a sentence}
+for (i in 1:nrow(speech)){
+  sent <- sent_detect(speech$text[i], endmarks = c('.','?','!','|'))
+  speech$num_of_sent[i] <- length(sent) 
+  word_num <- word_count(sent)
+  word_num <- replace(word_num, is.na(word_num), 0)
+  speech$avg_word_a_sent[i] <- mean(word_num)
+}
+```
+
+```{r, sentiment analysis}
+sentiment_matrix <- get_nrc_sentiment(speech$text) / (word_count(speech$text) + 0.01)
+speech <- data.frame(speech, sentiment_matrix)
+```
+
+```{r, convert sentence as dataframe row}
+sp_sent <- data.frame()
+for (i in 1:nrow(speech)){
+  sent <-  sent_detect(speech$text[i], endmarks = c('.','?','!','|'))
+  sp_sent <- rbind(sp_sent, data.frame('sentence' = sent,
+                   'president' = speech$doc_id[i], 'sent_order' = 1:length(sent)))
+}
+```
+
+```{r, get word count, sentiment score and etc}
+sp_sent$word_num <- word_count(sp_sent$sentence)
+sp_sent$word_num <- ifelse(is.na(sp_sent$word_num), 0, sp_sent$word_num)
+sp_sent$sentence <- as.character(sp_sent$sentence)
+sp_sent <- data.frame(sp_sent, get_nrc_sentiment(sp_sent$sentence)/(sp_sent$word_num + 0.01))
+```
+
+```{r, plot the sentiment pos/neg graph of one inaugural speech}
+sp_sent <- mutate(sp_sent, sentiment = positive - negative)
+sp_sent$president <- as.character(sp_sent$president)
+# ggplot(filter(sp_sent, president == 'abrahamlincoln-1'), aes(sent_order, sentiment))
+
+par(mfrow = c(2,1))
+
+ggplot(filter(sp_sent, president == 'abrahamlincoln-1')) +
+  geom_col(mapping = aes(sent_order, sentiment)) +
+  ggtitle('Lincoln')
+  
+
+ggplot(filter(sp_sent, president == "donaldjtrump-1")) +
+  geom_col(mapping = aes(sent_order, sentiment)) +
+  ggtitle('Donald Trump')
+
+```
+
+```{r, topic modeling preprocessing}
+sp_corpus <- Corpus(VectorSource(speech$text)) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removeWords, character(0)) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(removeWords, stopwords('english'))
+  tm_map(stemDocument)
+sp_doc <- DocumentTermMatrix(sp_corpus)
+
+```
+
+```{r, LDA}
+burnin <- 4000
+iter <- 2000
+thin <- 500
+seed <-list(2003,5,63,100001,765)
+nstart <- 5
+best <- TRUE
+
+#Number of topics
+k <- 15
+
+#Run LDA using Gibbs sampling
+ldaOut <-LDA(sp_doc, k, method="Gibbs", control=list(nstart=nstart, 
+                                                 seed = seed, best=best,
+                                                 burnin = burnin, iter = iter, 
+                                                 thin=thin))
+```
+
+```{r, LDA results analysis}
+ldaOut.topics <- as.matrix(topics(ldaOut))
+table(c(1:k, ldaOut.topics))
+write.csv(ldaOut.topics,file=paste("../output/LDAGibbs",k,"DocsToTopics.csv"))
+
+ldaOut.terms <- as.matrix(terms(ldaOut,20))
+write.csv(ldaOut.terms,file=paste("../output/LDAGibbs",k,"TopicsToTerms.csv"))
+```
+
+
+```{r, try}
+sp_text <- speech$text %>%
+  removePunctuation() %>%
+  removeNumbers() %>%
+  removeWords(character(0)) %>%
+  stripWhitespace() %>%
+  removeWords(stopwords('english'))
+  stemDocument()
+sp_doc <- DocumentTermMatrix(Corpus(VectorSource(sp_text)))
+
+```
+
+```{r}
+head()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
